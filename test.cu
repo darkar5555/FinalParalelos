@@ -1,18 +1,3 @@
-/*
-Copyright 2013  Bryan Catanzaro
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 #include <thrust/device_vector.h>
 #include "kmeans.h"
 #include "timer.h"
@@ -84,15 +69,15 @@ void tiny_test() {
     print_array(labels, n, 1);
     
     int i = kmeans::kmeans(iterations, n, d, k, data, labels, centroids, distances);
-    std::cout << "Performed " << i << " iterations" << std::endl;
+    std::cout << "Desempenho " << i << " iterations" << std::endl;
 
     std::cout << "Labels: " << std::endl;
     print_array(labels, n, 1);
 
-    std::cout << "Centroids:" << std::endl;
+    std::cout << "Centroides:" << std::endl;
     print_array(centroids, k, d);
 
-    std::cout << "Distances:" << std::endl;
+    std::cout << "Distancias:" << std::endl;
     print_array(distances, n, 1);
 
 }
@@ -159,11 +144,11 @@ void huge_test() {
     thrust::device_vector<T> centroids(k * d);
     thrust::device_vector<T> distances(n);
     
-    std::cout << "Generating random data" << std::endl;
-    std::cout << "Number of points: " << n << std::endl;
-    std::cout << "Number of dimensions: " << d << std::endl;
-    std::cout << "Number of clusters: " << k << std::endl;
-    std::cout << "Number of iterations: " << iterations << std::endl;
+    std::cout << "Genarando datos randoms" << std::endl;
+    std::cout << "Numero de puntos: " << n << std::endl;
+    std::cout << "Numero de dimensiones " << d << std::endl;
+    std::cout << "Numero de clusters: " << k << std::endl;
+    std::cout << "Numero de iteraciones: " << iterations << std::endl;
     std::cout << "Precision: " << typeid(T).name() << std::endl;
     
     random_data(data, n, d);
@@ -177,10 +162,10 @@ void huge_test() {
 }
 
 int main() {
-    std::cout << "Input a character to choose a test:" << std::endl;
-    std::cout << "Tiny test: t" << std::endl;
-    std::cout << "More tiny test: m" << std::endl;
-    std::cout << "Huge test: h: " << std::endl;
+    std::cout << "Eliga que tipo de test quiere:" << std::endl;
+    std::cout << "Pequenho test: t" << std::endl;
+    std::cout << "Otro pequenho test: m" << std::endl;
+    std::cout << "Test grande: h: " << std::endl;
     char c;
     std::cin >> c;
     switch (c) {
@@ -193,9 +178,9 @@ int main() {
     case 'h':
         break;
     default:
-        std::cout << "Choice not understood, running huge test" << std::endl;
+        std::cout << "Corriendo test grande" << std::endl;
     }
-    std::cout << "Double precision (d) or single precision (f): " << std::endl;
+    std::cout << "Doble precision (d) o simple precision (f): " << std::endl;
     std::cin >> c;
     switch(c) {
     case 'd':
@@ -204,7 +189,7 @@ int main() {
     case 'f':
         break;
     default:
-        std::cout << "Choice not understood, running single precision"
+        std::cout << "Corriendo presicion simple"
                   << std::endl;
     }
     huge_test<float>();

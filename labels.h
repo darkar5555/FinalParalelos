@@ -1,18 +1,3 @@
-/*
-Copyright 2013  Bryan Catanzaro
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 #pragma once
 #include <thrust/device_vector.h>
 #include <cfloat>
@@ -21,17 +6,6 @@ limitations under the License.
 namespace kmeans {
 namespace detail {
 
-//n: number of points
-//d: dimensionality of points
-//data: points, laid out in row-major order (n rows, d cols)
-//dots: result vector (n rows)
-// NOTE:
-//Memory accesses in this function are uncoalesced!!
-//This is because data is in row major order
-//However, in k-means, it's called outside the optimization loop
-//on the large data array, and inside the optimization loop it's
-//called only on a small array, so it doesn't really matter.
-//If this becomes a performance limiter, transpose the data somewhere
 template<typename T>
 __global__ void self_dots(int n, int d, T* data, T* dots) {
 	T accumulator = 0;
@@ -131,12 +105,12 @@ void calculate_distances(int n, int d, int k,
     gemm(CUBLAS_OP_T, CUBLAS_OP_N,
          n, k, d, &alpha,
          thrust::raw_pointer_cast(data.data()),
-         d,//Has to be n or d
+         d,
          thrust::raw_pointer_cast(centroids.data()),
-         d,//Has to be k or d
+         d,
          &beta,
          thrust::raw_pointer_cast(pairwise_distances.data()),
-         n); //Has to be n or k
+         n);
 }
 
 template<typename T>

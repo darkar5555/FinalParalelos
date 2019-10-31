@@ -1,19 +1,3 @@
-/*
-Copyright 2013  Bryan Catanzaro
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 #pragma once
 #include <thrust/device_vector.h>
 #include <thrust/sort.h>
@@ -101,9 +85,7 @@ __global__ void scale_centroids(int d, int k, int* counts, T* centroids) {
     int global_id_y = threadIdx.y + blockIdx.y * blockDim.y;
     if ((global_id_x < d) && (global_id_y < k)) {
         int count = counts[global_id_y];
-        //To avoid introducing divide by zero errors
-        //If a centroid has no weight, we'll do no normalization
-        //This will keep its coordinates defined.
+
         if (count < 1) {
             count = 1;
         }
@@ -115,9 +97,6 @@ __global__ void scale_centroids(int d, int k, int* counts, T* centroids) {
 template<typename T>
 void find_centroids(int n, int d, int k,
                     thrust::device_vector<T>& data,
-                    //Labels are taken by value because
-                    //they get destroyed in sort_by_key
-                    //So we need to make a copy of them
                     thrust::device_vector<int> labels,
                     thrust::device_vector<T>& centroids) {
     thrust::device_vector<int> indices(n);
@@ -125,21 +104,19 @@ void find_centroids(int n, int d, int k,
     thrust::copy(thrust::counting_iterator<int>(0),
                  thrust::counting_iterator<int>(n),
                  indices.begin());
-    //Bring all labels with the same value together
     thrust::sort_by_key(labels.begin(),
                         labels.end(),
                         indices.begin());
 
-    //Initialize centroids to all zeros
+    //Centroides en cero
     thrust::fill(centroids.begin(),
                  centroids.end(),
                  0);
     
-    //Calculate centroids 
+    //Calculando centroides
     int n_threads_x = 64;
     int n_threads_y = 16;
-    //XXX Number of blocks here is hard coded at 30
-    //This should be taken care of more thoughtfully.
+
     detail::calculate_centroids<<<dim3(1, 30), dim3(n_threads_x, n_threads_y)>>>
         (n, d, k,
          thrust::raw_pointer_cast(data.data()),
@@ -148,7 +125,7 @@ void find_centroids(int n, int d, int k,
          thrust::raw_pointer_cast(centroids.data()),
          thrust::raw_pointer_cast(counts.data()));
     
-    //Scale centroids
+    //escala de los centroides
     detail::scale_centroids<<<dim3((d-1)/32+1, (k-1)/32+1), dim3(32, 32)>>>
         (d, k,
          thrust::raw_pointer_cast(counts.data()),
